@@ -25,7 +25,7 @@ async function main() {
   const outPath = path.join(outDir, `${today}-gemini-quote.md`);
   fs.writeFileSync(outPath, md);
 
-  console.log("✅ Gemini quote saved:", outPath);
+  console.log("✅  Gemini quote saved:", outPath);
 }
 
 main().catch(err => {
