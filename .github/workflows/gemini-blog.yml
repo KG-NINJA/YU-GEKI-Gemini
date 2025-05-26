@@ -1,13 +1,13 @@
-# .github/workflows/your-workflow-file.yml の中の適切な場所に追加
-
+# ワークフロー全体にリポジトリへの書き込み権限を付与
 permissions:
-  contents: write # リポジトリのコンテンツへの書き込み権限を付与
+  contents: write
+
 name: Daily Gemini Quote Blog
 
 on:
   schedule:
     - cron: '0 17 * * *'  # 日本時間02:00（UTCで指定）
-  workflow_dispatch:
+  workflow_dispatch:     #手動実行も可能にする
 
 jobs:
   generate-quote:
@@ -18,29 +18,29 @@ jobs:
 
     steps:
       - name: 📥 リポジトリをチェックアウト
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # 最新のv4に更新
 
       - name: 🛠 Node.js セットアップ
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # 最新のv4に更新
         with:
           node-version: '18'
 
       - name: 📦 依存パッケージのインストール（axios）
-        run: npm install axios
+        run: npm install axios # package.jsonがない場合はこれでOK
 
       - name: ✨ Gemini APIで格言（日本語＋英語）を生成しMarkdownに保存
         run: |
           node .github/scripts/generate-quote.js
 
-     - name: ✅ Gitへコミット＆プッシュ
+      - name: ✅ Gitへコミット＆プッシュ
         run: |
-          git config user.name "github-actions[bot]" # Gitのユーザー情報をより一般的なボット用に変更（オプション）
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" # 同上
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add _posts/*.md
           # 変更があった場合のみコミットとプッシュを実行
           if ! git diff --cached --quiet; then
             echo "変更を検出しました。コミットとプッシュを実行します。"
-            git commit -m "🧠 Gemini格言を自動投稿 (`date --iso-8601=seconds`)" # コミットメッセージに日時を追加（オプション）
+            git commit -m "🧠 Gemini格言を自動投稿 (`date --iso-8601=seconds`)"
             git push
           else
             echo "変更はありませんでした。コミットとプッシュはスキップします。"
