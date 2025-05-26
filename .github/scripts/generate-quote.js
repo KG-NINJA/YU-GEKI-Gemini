@@ -15,7 +15,8 @@ async function main() {
   const prompt = "1つの日本語の格言と、それに対応する英語訳をセットで、50文字前後の短い名言として生成してください。前後の説明や記号を省き、純粋な日本語と英語の格言だけを出力してください。";
 
   const res = await axios.post(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+  `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`
+
     {
       contents: [{ parts: [{ text: prompt }] }]
     }
