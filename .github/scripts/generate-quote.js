@@ -1,8 +1,4 @@
----
-# 📦 Gemini格言ブログ自動化スターターパック（BuyMeACoffee＆Twitter付き、日本語＋英語対応）
-# GitHub Pages + GitHub Actionsで完結する構成
-# 毎日午前2時（日本時間）にGemini APIで日本語＋英語の格言を生成し、自動投稿します
-
+const axios = require("axios");
 name: Daily Gemini Quote Blog
 
 on:
