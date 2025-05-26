@@ -15,7 +15,7 @@ const TWITTER_SHARE_URL = "https://twitter.com/intent/tweet?text=今日のAI格�
 async function main() {
   const prompt = "1つの日本語の格言と、それに対応する英語訳をセットで、50文字前後の短い名言として生成してください。前後の説明や記号を省き、純粋な日本語と英語の格言だけを出力してください。";
 
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
   // APIリクエストを実行
   const res = await axios.post(url, {
