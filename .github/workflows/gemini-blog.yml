@@ -32,10 +32,16 @@ jobs:
         run: |
           node .github/scripts/generate-quote.js
 
-      - name: ✅ Gitへコミット＆プッシュ
+     - name: ✅ Gitへコミット＆プッシュ
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config user.name "github-actions[bot]" # Gitのユーザー情報をより一般的なボット用に変更（オプション）
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com" # 同上
           git add _posts/*.md
-          git commit -m "🧠 Gemini格言を自動投稿"
-          git push
+          # 変更があった場合のみコミットとプッシュを実行
+          if ! git diff --cached --quiet; then
+            echo "変更を検出しました。コミットとプッシュを実行します。"
+            git commit -m "🧠 Gemini格言を自動投稿 (`date --iso-8601=seconds`)" # コミットメッセージに日時を追加（オプション）
+            git push
+          else
+            echo "変更はありませんでした。コミットとプッシュはスキップします。"
+          fi
