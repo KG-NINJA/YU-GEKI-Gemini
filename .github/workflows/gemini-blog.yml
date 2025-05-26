@@ -9,6 +9,9 @@ jobs:
   generate-quote:
     runs-on: ubuntu-latest
 
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
     steps:
       - name: 📥 リポジトリをチェックアウト
         uses: actions/checkout@v3
