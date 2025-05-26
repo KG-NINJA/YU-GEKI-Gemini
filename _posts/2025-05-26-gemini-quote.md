@@ -5,7 +5,7 @@ tags: [AI, 格言]
 ---
 
 七転び八起き
-Fall seven times, stand up eight.
+Fall down seven times, get up eight.
 
 ---
 
