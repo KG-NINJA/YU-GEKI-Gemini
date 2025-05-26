@@ -3,7 +3,12 @@ const fs = require("fs");
 const path = require("path");
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const BMAC_LINK = "https://www.buymeacoffee.com/YOUR_USERNAME";
+if (!GEMINI_API_KEY) {
+  console.error("❌ GEMINI_API_KEY が設定されていません。GitHub Secretsを確認してください。");
+  process.exit(1);
+}
+
+const BMAC_LINK = "https://www.buymeacoffee.com/kgninja";
 const TWITTER_SHARE_URL = "https://twitter.com/intent/tweet?text=今日のAI格言はこちら！&url=https://YOUR_GITHUB_USERNAME.github.io/";
 
 async function main() {
