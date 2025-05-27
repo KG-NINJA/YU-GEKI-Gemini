@@ -1,28 +1,33 @@
-// assets/js/stamp-card.js
+// assets/js/stamp-card.js (デバッグ用 console.log 追加版)
 
 document.addEventListener('DOMContentLoaded', function() {
-    const STORAGE_KEY_USER_PROGRESS = 'geminiQuoteBlogUserProgress_v1'; // Added version for potential future structure changes
-    const todayString = new Date().toISOString().split('T')[0];
+    console.log("stamp-card.js: DOMContentLoaded - スクリプト開始"); // スクリプト開始のログ
 
-    // User data from LocalStorage (or initialize if none)
+    const STORAGE_KEY_USER_PROGRESS = 'geminiQuoteBlogUserProgress_v1';
+    const todayString = new Date().toISOString().split('T')[0];
+    console.log("stamp-card.js: 今日 (todayString):", todayString);
+
     let userData = JSON.parse(localStorage.getItem(STORAGE_KEY_USER_PROGRESS)) || {
         lastVisitDate: null,
         stamps: 0,
-        rank: "Curious Newcomer" // Initial English rank
+        rank: "Curious Newcomer"
     };
+    console.log("stamp-card.js: 読み込み直後の userData:", JSON.stringify(userData, null, 2));
 
-    // Increment stamp if it's a new day's visit
     if (userData.lastVisitDate !== todayString) {
+        console.log("stamp-card.js: 新しい日の訪問です。スタンプ処理を実行します。");
         userData.stamps += 1;
         userData.lastVisitDate = todayString;
-        // Update rank based on new stamp count
-        updateUserRank();
-        // Save updated user data to LocalStorage
+        updateUserRank(); // ランク更新を呼び出し
         localStorage.setItem(STORAGE_KEY_USER_PROGRESS, JSON.stringify(userData));
+        console.log("stamp-card.js: スタンプ処理後の userData:", JSON.stringify(userData, null, 2));
+    } else {
+        console.log("stamp-card.js: 今日は既に訪問済みです。");
     }
 
-    // Rank update logic (titles and thresholds are examples, feel free to customize)
     function updateUserRank() {
+        console.log("stamp-card.js: updateUserRank 関数が呼ばれました。現在のスタンプ数:", userData.stamps);
+        const oldRank = userData.rank;
         if (userData.stamps >= 30) {
             userData.rank = "Quote Virtuoso";
         } else if (userData.stamps >= 15) {
@@ -32,33 +37,42 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (userData.stamps >= 3) {
             userData.rank = "Quote Collector";
         }
-        // You can add code here to display the rank on the page if you want
-        // e.g., const rankDisplay = document.getElementById('userRankDisplay');
-        //       if (rankDisplay) rankDisplay.textContent = `Your Title: ${userData.rank}`;
+        // ランクが実際に更新されたか、または初期設定のランクかを確認
+        if (oldRank !== userData.rank) {
+            console.log("stamp-card.js: ランクが更新されました。新しいランク:", userData.rank);
+        } else {
+            console.log("stamp-card.js: ランクに変更はありません。現在のランク:", userData.rank);
+        }
     }
 
-    // (Re)calculate and potentially display rank on page load
-    updateUserRank(); 
+    updateUserRank(); // ページ読み込み時にランクを（再）計算
+    console.log("stamp-card.js: ページ読み込み時の最終的な userData.rank:", userData.rank);
 
-    // Dynamically set up Twitter share buttons
+
     const shareButtons = document.querySelectorAll('.twitter-share-button');
-    shareButtons.forEach(button => {
+    console.log("stamp-card.js: 検出された共有ボタンの数:", shareButtons.length);
+
+    shareButtons.forEach((button, index) => {
+        console.log(`stamp-card.js: 共有ボタン ${index + 1} を処理中`);
         const postPermalink = button.getAttribute('data-post-permalink');
         const tweetEssence = button.getAttribute('data-tweet-essence');
+        console.log(`stamp-card.js: ボタン ${index + 1} - permalink:`, postPermalink);
+        console.log(`stamp-card.js: ボタン ${index + 1} - essence:`, tweetEssence);
 
         if (postPermalink && tweetEssence) {
-            // Construct tweet text including the English rank
             const tweetText = `[${userData.rank}] AI Quote of the Day: "${tweetEssence}" See more 👇`;
             const encodedTweetText = encodeURIComponent(tweetText);
             const encodedPermalink = encodeURIComponent(postPermalink);
             
             button.href = `https://twitter.com/intent/tweet?text=${encodedTweetText}&url=${encodedPermalink}`;
-            button.target = "_blank"; // Open in a new tab
-            button.rel = "noopener noreferrer"; // Security measure
+            button.target = "_blank";
+            button.rel = "noopener noreferrer";
+            console.log(`stamp-card.js: ボタン ${index + 1} の href を更新しました:`, button.href);
         } else {
-            // Fallback if data attributes are missing (e.g., hide the button)
-            // console.warn("Share button missing data attributes:", button);
+            console.warn(`stamp-card.js: ボタン ${index + 1} に data属性が不足しているか、値がありません。`);
             button.style.display = 'none';
         }
     });
+
+    console.log("stamp-card.js: スクリプト終了"); // スクリプト終了のログ
 });
