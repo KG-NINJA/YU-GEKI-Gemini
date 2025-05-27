@@ -5,10 +5,10 @@ tags: [AI, Quote, English]
 layout: post
 ---
 
-七転び八起き。
-Fall down seven times, get up eight.
+七転び八起き
+Fall down seven times, stand up eight.
 ---
 
 ☕️ [Buy Me a Coffee](https://www.buymeacoffee.com/kgninja)
 
-🐦 <a href="#" class="twitter-share-button" data-post-permalink="https://kg-ninja.github.io/YU-GEKI-Gemini/2025/05/27/gemini-quote.html" data-tweet-essence="Perseverance leads to triumph.">Share on X with Title!</a>
+🐦 <a href="#" class="twitter-share-button" data-post-permalink="https://kg-ninja.github.io/YU-GEKI-Gemini/2025/05/27/gemini-quote.html" data-tweet-essence="Persevere through setbacks, rise stronger.">Share on X with Title!</a>
