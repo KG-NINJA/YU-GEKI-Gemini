@@ -27,7 +27,7 @@ function getFallbackEssence(fullText) {
     }
     if (potentialEnglishLine) {
         fallbackText = potentialEnglishLine;
-    } else if (lines[0].trim() !== "") { // それでも見つからなければ最初の行 (日本語の可能性もある)
+    } else if (lines[0].trim() !== "") { // それでも見つからなければ最初の行
         fallbackText = lines[0].trim();
     }
   }
@@ -64,26 +64,22 @@ Summary: Hard work leads to success.
   let tweetEssence = "Check out the latest AI quote!";
 
   if (apiGeneratedText) {
-    const summaryMarker = "\nSummary:"; // マーカーは改行を含む
+    const summaryMarker = "\nSummary:";
     const summaryIndex = apiGeneratedText.indexOf(summaryMarker);
 
     if (summaryIndex !== -1) {
-      // "Summary:" マーカーが見つかった場合
       displayQuote = apiGeneratedText.substring(0, summaryIndex).trim();
       let potentialEssence = apiGeneratedText.substring(summaryIndex + summaryMarker.length).trim();
-      // Summaryの後の最初の1行だけをエッセンスとして採用
       tweetEssence = potentialEssence.split('\n')[0].trim();
       
-      // もしエッセンスが空文字になってしまった場合の保険 (Summary: の直後が空行だったなど)
       if (tweetEssence === "") {
           if (potentialEssence.split('\n').length > 1 && potentialEssence.split('\n')[1].trim() !== "") {
-              tweetEssence = potentialEssence.split('\n')[1].trim(); // 次の行を試す
+              tweetEssence = potentialEssence.split('\n')[1].trim();
           } else {
-              tweetEssence = getFallbackEssence(displayQuote); // それでもダメならフォールバック
+              tweetEssence = getFallbackEssence(displayQuote);
           }
       }
     } else {
-      // "Summary:"マーカーが見つからない場合は、全体をdisplayQuoteとし、エッセンスはフォールバック
       displayQuote = apiGeneratedText.trim();
       tweetEssence = getFallbackEssence(displayQuote);
     }
@@ -95,11 +91,10 @@ Summary: Hard work leads to success.
   const postPath = `/${year}/${month}/${day}/gemini-quote.html`;
   const postPermalink = `${SITE_BASE_URL}${postPath}`;
 
-  const tweetText = `AI Quote of the Day: "${tweetEssence}" See more 👇`;
-  const encodedTweetText = encodeURIComponent(tweetText);
-  const encodedPostPermalink = encodeURIComponent(postPermalink);
-  const dynamicTwitterShareUrl = `https://twitter.com/intent/tweet?text=${encodedTweetText}&url=${encodedPostPermalink}`;
+  // HTML属性値として安全にするため、tweetEssence内のダブルクォートを &quot; に置換
+  const safeTweetEssenceForDataAttr = tweetEssence.replace(/"/g, '&quot;');
 
+  // ▼▼▼ Markdown内のツイートボタンのHTMLを変更 ▼▼▼
   const md = `---
 title: "Gemini's Wisdom ${today}"
 date: ${today}
@@ -112,8 +107,9 @@ ${displayQuote}
 
 ☕️ [Buy Me a Coffee](${BMAC_LINK})
 
-🐦 [Share on X](${dynamicTwitterShareUrl})
+🐦 <a href="#" class="twitter-share-button" data-post-permalink="${postPermalink}" data-tweet-essence="${safeTweetEssenceForDataAttr}">Share on X with Title!</a>
 `;
+  // ▲▲▲ Markdown内のツイートボタンのHTMLを変更 ▲▲▲
 
   const outDir = path.join(process.cwd(), "_posts");
   if (!fs.existsSync(outDir)) {
