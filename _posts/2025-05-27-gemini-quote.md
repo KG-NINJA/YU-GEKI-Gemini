@@ -1,0 +1,14 @@
+---
+title: "Gemini's Wisdom 2025-05-27"
+date: 2025-05-27
+tags: [AI, Quote, English]
+layout: post
+---
+
+七転び八起き
+Fall down seven times, get up eight.
+---
+
+☕️ [Buy Me a Coffee](https://www.buymeacoffee.com/kgninja)
+
+🐦 [Share on X](https://twitter.com/intent/tweet?text=AI%20Quote%20of%20the%20Day%3A%20%22Perseverance%20leads%20to%20triumph.%0A%0A%0A%E6%80%A5%E3%81%8C%E3%81%B0%E5%9B%9E%E3%82%8C%0AHaste%20makes%20waste%3B%20%20look%20before%20you%20leap.%22%20See%20more%20%F0%9F%91%87&url=https%3A%2F%2Fkg-ninja.github.io%2FYU-GEKI-Gemini%2F2025%2F05%2F27%2Fgemini-quote.html)
