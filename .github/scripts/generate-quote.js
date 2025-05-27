@@ -10,13 +10,36 @@ if (!GEMINI_API_KEY) {
 }
 
 const BMAC_LINK = "https://www.buymeacoffee.com/kgninja";
-const SITE_BASE_URL = "https://kg-ninja.github.io/YU-GEKI-Gemini"; // あなたのサイトのベースURL
+const SITE_BASE_URL = "https://kg-ninja.github.io/YU-GEKI-Gemini";
+
+// フォールバック関数: Summaryが見つからない場合に英語の行からエッセンスを生成しようとする
+function getFallbackEssence(fullText) {
+  const lines = fullText.split('\n');
+  let fallbackText = "Check out the latest AI quote!"; // デフォルトのフォールバックテキスト
+  if (lines.length > 0) {
+    let potentialEnglishLine = "";
+    // 最後の行から英字が含まれる行を探す (英語の格言と仮定)
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (/[a-zA-Z]/.test(lines[i]) && lines[i].trim() !== "") {
+        potentialEnglishLine = lines[i].trim();
+        break;
+      }
+    }
+    if (potentialEnglishLine) {
+        fallbackText = potentialEnglishLine;
+    } else if (lines[0].trim() !== "") { // それでも見つからなければ最初の行 (日本語の可能性もある)
+        fallbackText = lines[0].trim();
+    }
+  }
+  // ツイートに適した長さに調整
+  return fallbackText.substring(0, 80) + (fallbackText.length > 80 ? "..." : "");
+}
 
 async function main() {
   const prompt = `
 短い日本語の格言と、それに対応する英語訳を生成してください（それぞれ50文字程度）。
 次に、その格言の非常に短い英語の要約（ツイート用、10～20語程度）を「Summary:」という接頭辞を付けて、改行してから生成してください。
-他の前置きや説明文は一切含めないでください。
+「Summary:」の行の後は、何も出力しないでください。他の前置きや説明文は一切含めないでください。
 
 例：
 努力は必ず報われる。
@@ -32,55 +55,49 @@ Summary: Hard work leads to success.
 
   const apiGeneratedText = res.data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
-  let displayQuote = "Today's quote is taking a break due to AI whims. Please check back later!"; // ブログページに表示する格言全文
-  let tweetEssence = "Check out the latest AI quote!"; // ツイートするエッセンス (デフォルト)
+  // デバッグ用にAPIからの生レスポンスを出力したい場合は、以下のコメントを解除してください
+  // console.log("--- RAW API Response Text START ---");
+  // console.log(apiGeneratedText);
+  // console.log("--- RAW API Response Text END ---");
+
+  let displayQuote = "Today's quote is taking a break due to AI whims. Please check back later!";
+  let tweetEssence = "Check out the latest AI quote!";
 
   if (apiGeneratedText) {
-    const parts = apiGeneratedText.split("\nSummary:"); // 「改行＋Summary:」で分割
-    displayQuote = parts[0].trim(); // 「Summary:」より前の部分が格言全文 (日本語と英語を含む)
-    
-    if (parts.length > 1 && parts[1].trim() !== "") {
-      tweetEssence = parts[1].trim(); // 「Summary:」より後の部分が英語の要約
-    } else {
-      // 要約がうまく取れなかった場合のフォールバック処理
-      // displayQuote (日本語格言\n英語格言) から英語部分を推測して要約に使用
-      const lines = displayQuote.split('\n');
-      let fallbackText = "Check out the latest AI quote!"; // デフォルトのフォールバックテキスト
-      if (lines.length > 0) {
-        // 最後の行が英語格言であると仮定、または英字を含む行を探す
-        let potentialEnglishLine = "";
-        for (let i = lines.length - 1; i >= 0; i--) {
-          if (/[a-zA-Z]/.test(lines[i]) && lines[i].trim() !== "") {
-            potentialEnglishLine = lines[i].trim();
-            break;
+    const summaryMarker = "\nSummary:"; // マーカーは改行を含む
+    const summaryIndex = apiGeneratedText.indexOf(summaryMarker);
+
+    if (summaryIndex !== -1) {
+      // "Summary:" マーカーが見つかった場合
+      displayQuote = apiGeneratedText.substring(0, summaryIndex).trim();
+      let potentialEssence = apiGeneratedText.substring(summaryIndex + summaryMarker.length).trim();
+      // Summaryの後の最初の1行だけをエッセンスとして採用
+      tweetEssence = potentialEssence.split('\n')[0].trim();
+      
+      // もしエッセンスが空文字になってしまった場合の保険 (Summary: の直後が空行だったなど)
+      if (tweetEssence === "") {
+          if (potentialEssence.split('\n').length > 1 && potentialEssence.split('\n')[1].trim() !== "") {
+              tweetEssence = potentialEssence.split('\n')[1].trim(); // 次の行を試す
+          } else {
+              tweetEssence = getFallbackEssence(displayQuote); // それでもダメならフォールバック
           }
-        }
-        if (potentialEnglishLine) {
-            fallbackText = potentialEnglishLine;
-        } else if (lines[0].trim() !== "") { // それでも見つからなければ最初の行
-            fallbackText = lines[0].trim();
-        }
       }
-      // ツイートに適した長さに調整
-      tweetEssence = fallbackText.substring(0, 80) + (fallbackText.length > 80 ? "..." : "");
+    } else {
+      // "Summary:"マーカーが見つからない場合は、全体をdisplayQuoteとし、エッセンスはフォールバック
+      displayQuote = apiGeneratedText.trim();
+      tweetEssence = getFallbackEssence(displayQuote);
     }
   }
 
   const today = new Date().toISOString().split("T")[0];
 
-  // 1. 投稿のパーマリンクを生成
   const [year, month, day] = today.split('-');
   const postPath = `/${year}/${month}/${day}/gemini-quote.html`;
   const postPermalink = `${SITE_BASE_URL}${postPath}`;
 
-  // 2. ツイートするテキストを準備 (英語のエッセンスを使用)
   const tweetText = `AI Quote of the Day: "${tweetEssence}" See more 👇`;
-
-  // 3. テキストとURLをエンコード
   const encodedTweetText = encodeURIComponent(tweetText);
   const encodedPostPermalink = encodeURIComponent(postPermalink);
-
-  // 4. 動的なTwitter共有URLを組み立て
   const dynamicTwitterShareUrl = `https://twitter.com/intent/tweet?text=${encodedTweetText}&url=${encodedPostPermalink}`;
 
   const md = `---
@@ -120,6 +137,5 @@ main().catch(err => {
   } else {
     console.error("Error setting up the request:", err.message);
   }
-  // console.error("Full error object for debugging:", err); // デバッグ時にコメントを外す
   process.exit(1);
 });
