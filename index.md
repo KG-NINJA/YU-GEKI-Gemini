@@ -1,9 +1,11 @@
 ---
 layout: default # default.html レイアウトを使用
-title: ホーム # このページのタイトル
+title: Home # このページのタイトル (英語に変更)
 ---
 
-## 最新の格言
+<p style="text-align: center; font-size: 0.9em; color: #555;"><em>New wisdom is delivered daily around 10:00 AM PDT.</em></p>
+
+## Latest Quotes
 
 {% if site.posts.size > 0 %}
   <ul class="post-list">
@@ -15,13 +17,12 @@ title: ホーム # このページのタイトル
           </a>
         </h3>
         <p class="post-meta">
-          <time datetime="{{ post.date | date_to_xmlschema }}">
-            {{ post.date | date: "%Y年%m月%d日" }}
-          </time>
+          <time datetime="{{ page.date | date_to_xmlschema }}">
+            {{ post.date | date: "%Y-%m-%d" }} </time>
         </p>
         </li>
     {% endfor %}
   </ul>
 {% else %}
-  <p>まだ投稿がありません。</p>
+  <p>No posts yet.</p>
 {% endif %}
