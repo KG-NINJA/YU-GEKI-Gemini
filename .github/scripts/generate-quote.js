@@ -10,7 +10,7 @@ if (!GEMINI_API_KEY) {
 }
 
 const BMAC_LINK = "https://www.buymeacoffee.com/kgninja";
-const SITE_BASE_URL = "https://kg-ninja.github.io/YU-GEKI-Gemini";
+const SITE_BASE_URL = "https://kg-ninja.github.io/YU-GEKI-Gemini"; // 格言ブログのURLに合わせてください
 
 // フォールバック関数: Summaryが見つからない場合に英語の行からエッセンスを生成しようとする
 function getFallbackEssence(fullText) {
@@ -37,10 +37,10 @@ function getFallbackEssence(fullText) {
 
 async function main() {
   const prompt = `
-海外には知られていない極めて日本的な日本語の格言と、それに対応する英語訳を生成してください（それぞれ50文字程度）。
+日本唯一無二の格言とそれに対応する英語訳を生成してください（それぞれ50文字程度）。
 次に、その格言の非常に短い英語の要約（ツイート用、10～20語程度）を「Summary:」という接頭辞を付けて、改行してから生成してください。
 「Summary:」の行の後は、何も出力しないでください。他の前置きや説明文は一切含めないでください。
-前回の出力とは全く異なる格言を生成してください。自然や宇宙の壮大さを感じさせ人と人のつながりを想起させる詩的な表現の格言だけを出力して。
+前回の出力とは全く異なる格言を生成してください。人生の喜びと悲しみの波の大切さと人と人のつながりを想起させる宇宙規模で壮大な格言を希望。
 
 例：
 努力は必ず報われる。
@@ -86,16 +86,24 @@ Summary: Hard work leads to success.
     }
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]; // UTCでの今日の日付
 
   const [year, month, day] = today.split('-');
-  const postPath = `/${year}/${month}/${day}/gemini-quote.html`;
+  // 注意: YU-GEKI-Gemini (格言ブログ) 用のファイル名とパスです。
+  // Funwariyosoブログの場合は `gemini-quote.html` の部分を `funwari-forecast.html` などに変更してください。
+  const postPath = `/${year}/${month}/${day}/gemini-quote.html`; 
   const postPermalink = `${SITE_BASE_URL}${postPath}`;
 
-  // HTML属性値として安全にするため、tweetEssence内のダブルクォートを &quot; に置換
-  const safeTweetEssenceForDataAttr = tweetEssence.replace(/"/g, '&quot;');
+  // ツイートするテキストを準備 (英語のエッセンスを使用)
+  const tweetText = `AI Quote of the Day: "${tweetEssence}" See more 👇`;
 
-  // ▼▼▼ Markdown内のツイートボタンのHTMLを変更 ▼▼▼
+  // テキストとURLをエンコード
+  const encodedTweetText = encodeURIComponent(tweetText);
+  const encodedPostPermalink = encodeURIComponent(postPermalink);
+
+  // 動的なTwitter共有URLをここで直接生成
+  const dynamicTwitterShareUrl = `https://twitter.com/intent/tweet?text=${encodedTweetText}&url=${encodedPostPermalink}`;
+
   const md = `---
 title: "Gemini's Wisdom ${today}"
 date: ${today}
@@ -108,18 +116,18 @@ ${displayQuote}
 
 ☕️ [Buy Me a Coffee](${BMAC_LINK})
 
-🐦 <a href="#" class="twitter-share-button" data-post-permalink="${postPermalink}" data-tweet-essence="${safeTweetEssenceForDataAttr}">Share on X with Title!</a>
-`;
-  // ▲▲▲ Markdown内のツイートボタンのHTMLを変更 ▲▲▲
+🐦 [Share on X](${dynamicTwitterShareUrl}) `;
 
   const outDir = path.join(process.cwd(), "_posts");
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true });
   }
-  const outPath = path.join(outDir, `${today}-gemini-quote.md`);
+  // 注意: YU-GEKI-Gemini (格言ブログ) 用のファイル名です。
+  // Funwariyosoブログの場合は `${today}-gemini-quote.md` の部分を `${today}-funwari-forecast.md` などに変更してください。
+  const outPath = path.join(outDir, `${today}-gemini-quote.md`); 
   fs.writeFileSync(outPath, md);
 
-  console.log("✅ Gemini quote saved:", outPath);
+  console.log("✅ Quote saved:", outPath); // メッセージをQuoteに修正
   console.log("📝 Display Quote (for blog):\n", displayQuote);
   console.log("🐦 Tweet Essence (English for tweet):\n", tweetEssence);
 }
