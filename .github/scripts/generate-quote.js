@@ -95,7 +95,7 @@ Summary: Hard work leads to success.
   const postPermalink = `${SITE_BASE_URL}${postPath}`;
 
   // ツイートするテキストを準備 (英語のエッセンスを使用)
-  const tweetText = `AI Quote of the Day: "${tweetEssence}" #KGNINJA See more 👇`;
+  const tweetText = `AI Quote of the Day: "${tweetEssence}" #KGNINJA See more 🥷🏿👇`;
 
   // テキストとURLをエンコード
   const encodedTweetText = encodeURIComponent(tweetText);
